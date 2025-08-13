@@ -1,0 +1,1514 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Service Booking API",
+        "description": "Production-Quality Service Booking RESTful API in Laravel 12. This API serves a multi-user platform for managing service provider availability, enabling real-time booking by customers, and providing administrators with powerful reporting tools.",
+        "contact": {
+            "email": "admin@booking.api"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "Local Development Server"
+        },
+        {
+            "url": "/",
+            "description": "Current Domain"
+        }
+    ],
+    "paths": {
+        "/api/v1/admin/reports/bookings-summary": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get bookings summary report",
+                "description": "Get total bookings, cancellation rates, etc. with optional filtering",
+                "operationId": "1916636a9f860c7eaaa838f79c6197d1",
+                "parameters": [
+                    {
+                        "name": "provider_id",
+                        "in": "query",
+                        "description": "Filter by provider ID",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "01hw555666777"
+                        }
+                    },
+                    {
+                        "name": "service_id",
+                        "in": "query",
+                        "description": "Filter by service ID",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "01hw123456789"
+                        }
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "description": "Filter from date",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2024-01-01"
+                        }
+                    },
+                    {
+                        "name": "date_to",
+                        "in": "query",
+                        "description": "Filter to date",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2024-01-31"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Summary report retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 150
+                                                },
+                                                "confirmed": {
+                                                    "type": "integer",
+                                                    "example": 120
+                                                },
+                                                "cancelled": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "completed": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "cancellation_rate": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 0.133
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Not an admin"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register a new user",
+                "description": "Register a new user account (customer by default)",
+                "operationId": "ad77fe138bcb384ad65d167d5c8d1cc0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Registered"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "example": "01hw123456789"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "John Doe"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "john@example.com"
+                                                        },
+                                                        "role": {
+                                                            "type": "string",
+                                                            "example": "customer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Authenticate user",
+                "description": "Login user and receive Sanctum token",
+                "operationId": "bae68d1c55329ecb6e41f48285840c8f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "1|abcdef123456..."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid credentials"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout user",
+                "description": "Invalidate the current Sanctum token",
+                "operationId": "c5cdd87fdbf9d0f95dede875bd023dec",
+                "responses": {
+                    "200": {
+                        "description": "Logout successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logged out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/provider/availability": {
+            "get": {
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Get provider's availability schedule",
+                "description": "Get the recurring weekly availability schedule for the authenticated provider",
+                "operationId": "07613217f8419d01b8e23eaaad1bf31a",
+                "responses": {
+                    "200": {
+                        "description": "Availability schedule retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "01hw123456789"
+                                                    },
+                                                    "provider_id": {
+                                                        "type": "string",
+                                                        "example": "01hw555666777"
+                                                    },
+                                                    "day_of_week": {
+                                                        "description": "1=Monday, 7=Sunday",
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "start_time": {
+                                                        "type": "string",
+                                                        "example": "09:00"
+                                                    },
+                                                    "end_time": {
+                                                        "type": "string",
+                                                        "example": "17:00"
+                                                    },
+                                                    "timezone": {
+                                                        "type": "string",
+                                                        "example": "UTC"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Not a provider"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Set provider's availability schedule",
+                "description": "Create or update the recurring weekly availability schedule",
+                "operationId": "9f3537762ca725f542e1da028951d17b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "entries"
+                                ],
+                                "properties": {
+                                    "entries": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "day_of_week": {
+                                                    "description": "1=Monday, 7=Sunday",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "start_time": {
+                                                    "description": "HH:MM format",
+                                                    "type": "string",
+                                                    "example": "09:00"
+                                                },
+                                                "end_time": {
+                                                    "description": "HH:MM format",
+                                                    "type": "string",
+                                                    "example": "17:00"
+                                                },
+                                                "timezone": {
+                                                    "type": "string",
+                                                    "example": "UTC"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Availability schedule saved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Saved"
+                                        },
+                                        "data": {
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Not a provider"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/bookings": {
+            "get": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "List user's bookings",
+                "description": "Get bookings for the authenticated user (customer sees their bookings, provider sees bookings for their services)",
+                "operationId": "2f7e7260c708227e4c44de9d5b59ea36",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page (1-100)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bookings retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "example": "01hw987654321"
+                                                            },
+                                                            "customer_id": {
+                                                                "type": "string",
+                                                                "example": "01hw111222333"
+                                                            },
+                                                            "provider_id": {
+                                                                "type": "string",
+                                                                "example": "01hw444555666"
+                                                            },
+                                                            "service_id": {
+                                                                "type": "string",
+                                                                "example": "01hw123456789"
+                                                            },
+                                                            "start_time": {
+                                                                "type": "string",
+                                                                "example": "2024-01-15T10:00:00+00:00"
+                                                            },
+                                                            "end_time": {
+                                                                "type": "string",
+                                                                "example": "2024-01-15T10:30:00+00:00"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "pending"
+                                                            },
+                                                            "total_price": {
+                                                                "type": "string",
+                                                                "example": "25.00"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Create a new booking",
+                "description": "Book a service for a specific time slot (customers only)",
+                "operationId": "9ec8aa3de0d1efdd0cfe72c27eac745c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "service_id",
+                                    "start_time"
+                                ],
+                                "properties": {
+                                    "service_id": {
+                                        "type": "string",
+                                        "example": "01hw123456789"
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2024-01-15T10:00:00Z"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Booking created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Created"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "example": "01hw987654321"
+                                                },
+                                                "customer_id": {
+                                                    "type": "string",
+                                                    "example": "01hw111222333"
+                                                },
+                                                "provider_id": {
+                                                    "type": "string",
+                                                    "example": "01hw444555666"
+                                                },
+                                                "service_id": {
+                                                    "type": "string",
+                                                    "example": "01hw123456789"
+                                                },
+                                                "start_time": {
+                                                    "type": "string",
+                                                    "example": "2024-01-15T10:00:00+00:00"
+                                                },
+                                                "end_time": {
+                                                    "type": "string",
+                                                    "example": "2024-01-15T10:30:00+00:00"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "pending"
+                                                },
+                                                "total_price": {
+                                                    "type": "string",
+                                                    "example": "25.00"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Not a customer"
+                    },
+                    "422": {
+                        "description": "Time slot already occupied or validation error"
+                    },
+                    "429": {
+                        "description": "Too many requests - rate limit exceeded"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/bookings/{booking}/confirm": {
+            "post": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Confirm a booking",
+                "description": "Confirm a pending booking (provider only)",
+                "operationId": "e16984fa4156274ed27434e06d7bf083",
+                "parameters": [
+                    {
+                        "name": "booking",
+                        "in": "path",
+                        "description": "Booking ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01hw987654321"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Booking confirmed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Confirmed"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "example": "01hw987654321"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "confirmed"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Not the provider"
+                    },
+                    "404": {
+                        "description": "Booking not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/bookings/{booking}/cancel": {
+            "post": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Cancel a booking",
+                "description": "Cancel a booking (provider or customer)",
+                "operationId": "c8c7ae11e9aa4573adbf9a9df13f6910",
+                "parameters": [
+                    {
+                        "name": "booking",
+                        "in": "path",
+                        "description": "Booking ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01hw987654321"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Booking cancelled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cancelled"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "example": "01hw987654321"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "cancelled"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Not authorized to cancel this booking"
+                    },
+                    "404": {
+                        "description": "Booking not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/services": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Browse published services",
+                "description": "Get all published services with optional filtering by category",
+                "operationId": "24bc586fd2890f4230be3a9c1047c9ad",
+                "parameters": [
+                    {
+                        "name": "filter[category_id]",
+                        "in": "query",
+                        "description": "Filter by category ID",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "01hw987654321"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page (1-100)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Services retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "example": "01hw123456789"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Haircut"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Professional haircut service"
+                                                            },
+                                                            "duration": {
+                                                                "type": "integer",
+                                                                "example": 30
+                                                            },
+                                                            "price": {
+                                                                "type": "string",
+                                                                "example": "25.00"
+                                                            },
+                                                            "is_published": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            },
+                                                            "category_id": {
+                                                                "type": "string",
+                                                                "example": "01hw987654321"
+                                                            },
+                                                            "provider_id": {
+                                                                "type": "string",
+                                                                "example": "01hw555666777"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/services/{service}/availability": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Get available time slots",
+                "description": "Get dynamically calculated, bookable time slots for the next 7 days",
+                "operationId": "86dceefc667de447bffb63e62092b63f",
+                "parameters": [
+                    {
+                        "name": "service",
+                        "in": "path",
+                        "description": "Service ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01hw123456789"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Available slots retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "2024-01-15": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "2024-01-15T10:00:00+00:00"
+                                                    }
+                                                },
+                                                "2024-01-16": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "2024-01-16T09:00:00+00:00"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Service not found"
+                    }
+                }
+            }
+        },
+        "/api/v1/provider/services": {
+            "get": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "List provider's services",
+                "description": "Get all services for the authenticated provider",
+                "operationId": "4c01f2ade5b4846e69ce4bbd67248597",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page (1-100)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Services retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "01hw123456789"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Haircut"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Professional haircut service"
+                                                    },
+                                                    "duration": {
+                                                        "type": "integer",
+                                                        "example": 30
+                                                    },
+                                                    "price": {
+                                                        "type": "string",
+                                                        "example": "25.00"
+                                                    },
+                                                    "is_published": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "category_id": {
+                                                        "type": "string",
+                                                        "example": "01hw987654321"
+                                                    },
+                                                    "provider_id": {
+                                                        "type": "string",
+                                                        "example": "01hw555666777"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 42
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "has_more_pages": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "example": "http://localhost:8000/api/v1/provider/services?page=2"
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "example": null
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Not a provider"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Create a new service",
+                "description": "Create a new service for the authenticated provider",
+                "operationId": "d194b36f5ebce2b655a156bcfa5b8708",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "category_id",
+                                    "name",
+                                    "duration",
+                                    "price"
+                                ],
+                                "properties": {
+                                    "category_id": {
+                                        "type": "string",
+                                        "example": "01hw987654321"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Haircut"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Professional haircut service"
+                                    },
+                                    "duration": {
+                                        "description": "Duration in minutes",
+                                        "type": "integer",
+                                        "example": 30
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 25
+                                    },
+                                    "is_published": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Service created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Created"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "example": "01hw123456789"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Haircut"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Professional haircut service"
+                                                },
+                                                "duration": {
+                                                    "type": "integer",
+                                                    "example": 30
+                                                },
+                                                "price": {
+                                                    "type": "string",
+                                                    "example": "25.00"
+                                                },
+                                                "is_published": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "category_id": {
+                                                    "type": "string",
+                                                    "example": "01hw987654321"
+                                                },
+                                                "provider_id": {
+                                                    "type": "string",
+                                                    "example": "01hw555666777"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Not a provider"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/provider/services/{service}": {
+            "put": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Update a service",
+                "description": "Update an existing service (owner only)",
+                "operationId": "3b39e1cd46f613511807e8e53fb489d6",
+                "parameters": [
+                    {
+                        "name": "service",
+                        "in": "path",
+                        "description": "Service ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01hw123456789"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "category_id": {
+                                        "type": "string",
+                                        "example": "01hw987654321"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Premium Haircut"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Premium haircut with styling"
+                                    },
+                                    "duration": {
+                                        "type": "integer",
+                                        "example": 45
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 35
+                                    },
+                                    "is_published": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Service updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Not the owner"
+                    },
+                    "404": {
+                        "description": "Service not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Delete a service",
+                "description": "Delete an existing service (owner only)",
+                "operationId": "380164bdaffc69ebb5c4e23c18dd8325",
+                "parameters": [
+                    {
+                        "name": "service",
+                        "in": "path",
+                        "description": "Service ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01hw123456789"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Service deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Deleted"
+                                        },
+                                        "data": {
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Not the owner"
+                    },
+                    "404": {
+                        "description": "Service not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "description": "Enter token in format: Bearer {token}",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "User authentication endpoints"
+        },
+        {
+            "name": "Services",
+            "description": "Service management for providers"
+        },
+        {
+            "name": "Availability",
+            "description": "Provider availability management"
+        },
+        {
+            "name": "Bookings",
+            "description": "Booking management"
+        },
+        {
+            "name": "Public",
+            "description": "Public endpoints for browsing services"
+        },
+        {
+            "name": "Admin",
+            "description": "Admin reporting endpoints"
+        }
+    ]
+}
